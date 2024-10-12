@@ -17,6 +17,7 @@ export class DbService {
     const str = await readFile(filePath, {
       encoding: 'utf8',
     });
+
     if (!str) {
       return [];
     }
