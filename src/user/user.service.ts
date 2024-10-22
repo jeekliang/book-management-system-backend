@@ -1,7 +1,9 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { LoginUserDto } from './dto/login-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import {Repository} from 'typeorm'
+// import { CreateUserDto } from './dto/create-user.dto';
+// import { LoginUserDto } from './dto/login-user.dto';
+// import { UpdateUserDto } from './dto/update-user.dto';
 import { DbService } from 'src/db/db.service';
 import { User } from './entities/user.entity';
 
@@ -9,7 +11,11 @@ import { User } from './entities/user.entity';
 export class UserService {
   @Inject(DbService)
   dbService: DbService;
-  async create(createUserDto: CreateUserDto) {
+
+  @InjectRepository(User)
+  private readonly userRepository: Repository<User>;
+  
+  async create(createUserDto) {
     const users: User[] = await this.dbService.read();
     const foundUser = users.find(
       (user) => user.username === createUserDto.username,
@@ -26,7 +32,7 @@ export class UserService {
     return user;
   }
 
-  async login(loginUserDto: LoginUserDto) {
+  async login(loginUserDto) {
     console.log(loginUserDto);
     const users: User[] = await this.dbService.read();
     const foundUser = users.find(
@@ -45,7 +51,7 @@ export class UserService {
     return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  update(id: number, updateUserDto) {
     return `This action updates a #${id} user`;
   }
 
