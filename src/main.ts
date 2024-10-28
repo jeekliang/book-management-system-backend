@@ -11,7 +11,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.useStaticAssets(join(__dirname, '../uploads'), { prefix: '/uploads' });
-  app.useLogger(app.get(WINSTON_LOGGER_TOKEN));
+  // app.useLogger(app.get(WINSTON_LOGGER_TOKEN));
   
   await app.listen(3000);
 }

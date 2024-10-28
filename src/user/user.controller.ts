@@ -6,25 +6,42 @@ import {
   Patch,
   Param,
   Delete,
+  Inject,
+  Res
 } from '@nestjs/common';
 import { UserService } from './user.service';
-// import { CreateUserDto } from './dto/create-user.dto';
-// import { LoginUserDto } from './dto/login-user.dto';
+import { RegisterUserDto } from './dto/register.dto';
+import { LoginUserDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
 // import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Inject(JwtService)
+  private jwtService: JwtService;
+
   @Post('register')
-  create(@Body() createUserDto) {
-    // console.log('createUser', createUserDto);
-    return this.userService.create(createUserDto);
+  create(@Body() registerUser: RegisterUserDto) {
+    // console.log('register', registerUserDto);
+    return this.userService.register(registerUser);
   }
 
   @Post('login')
-  login(@Body() loginUserDto) {
-    return this.userService.login(loginUserDto);
+  async login(@Body() loginUser: LoginUserDto, @Res({ passthrough: true }) res: Response) {
+    const foundUser = await this.userService.login(loginUser);
+    if (foundUser) {
+      const token = await this.jwtService.signAsync({
+        username: foundUser.username,
+        id: foundUser.id
+      });
+      res.setHeader('token', token);
+      return '登录成功';
+    } else {
+      return '登录失败';
+    }
   }
 
   // @Get(':id')
