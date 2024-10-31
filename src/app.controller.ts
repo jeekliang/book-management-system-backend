@@ -1,4 +1,4 @@
-import { Controller, Get, Logger, Inject } from '@nestjs/common';
+import { Controller, Get, Inject } from '@nestjs/common';
 import { AppService } from './app.service';
 import { WINSTON_LOGGER_TOKEN } from './winston/winston.module';
 
@@ -6,8 +6,8 @@ import { WINSTON_LOGGER_TOKEN } from './winston/winston.module';
 export class AppController {
   constructor(private readonly appService: AppService) {}
   @Inject(WINSTON_LOGGER_TOKEN)
-  private logger
-  
+  private logger;
+
   @Get()
   getHello(): string {
     this.logger.log('Hello World!', AppController.name);

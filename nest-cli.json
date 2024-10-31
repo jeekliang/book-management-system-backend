@@ -6,6 +6,12 @@
     "spec": false
   },
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "assets": [
+      {
+        "include": "../config/*.yml",
+        "outDir": "./dist/config"
+      }
+    ]
   }
 }
