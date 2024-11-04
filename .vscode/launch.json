@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      // 调试方式改为附加
+      "request": "attach",
+      "name": "Attach Nest",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      // 启动调试器之前运行任务进行编译TS项目
+      "preLaunchTask": "npm: start:debug",
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js"
+      ]
+    }
+  ]
+}

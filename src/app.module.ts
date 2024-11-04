@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { User } from './user/entities/user.entity';
+import { Permission } from './user/entities/permission.entity';
 import { DbModule } from './db/db.module';
 import { BookModule } from './book/book.module';
 import { WinstonModule } from './winston/winston.module';
@@ -51,7 +52,7 @@ import { JwtModule } from '@nestjs/jwt';
           synchronize: true,
           logging: false,
           timezone: '+08:00',
-          entities: [User],
+          entities: [User, Permission],
           poolSize: 10,
           connectorPackage: 'mysql2',
           extra: { authPlugin: 'sha256_password' },
@@ -61,7 +62,7 @@ import { JwtModule } from '@nestjs/jwt';
     JwtModule.register({
       global: true,
       secret: 'Ljx!135790@.',
-      signOptions: { expiresIn: '24h' },
+      signOptions: { expiresIn: '7d' },
     }),
     UserModule,
   ],

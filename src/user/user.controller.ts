@@ -7,13 +7,16 @@ import {
   Param,
   Delete,
   Inject,
-  Res
+  Res,
+  UseGuards,
+  ValidationPipe
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { RegisterUserDto } from './dto/register.dto';
 import { LoginUserDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
+import { LoginGuard } from 'src/login.guard';
 // import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
@@ -30,12 +33,14 @@ export class UserController {
   }
 
   @Post('login')
-  async login(@Body() loginUser: LoginUserDto, @Res({ passthrough: true }) res: Response) {
+  async login(@Body(ValidationPipe) loginUser: LoginUserDto, @Res({ passthrough: true }) res: Response) {
     const foundUser = await this.userService.login(loginUser);
     if (foundUser) {
       const token = await this.jwtService.signAsync({
-        username: foundUser.username,
-        id: foundUser.id
+        user: {
+          username: foundUser.username,
+          id: foundUser.id
+        }
       });
       res.setHeader('token', token);
       return '登录成功';
@@ -44,10 +49,12 @@ export class UserController {
     }
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.userService.findOne(+id);
-  // }
+  @UseGuards(LoginGuard)
+  @Get('/user/:id')
+  async findOne(@Param('id') id: string) {
+    await this.userService.initData();
+    return '校验登录状态';
+  }
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
