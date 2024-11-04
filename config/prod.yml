@@ -3,5 +3,5 @@ db:
     host: 'localhost'
     port: 3306
     username: 'root'
-    password: 'Ljx!135790@.'
+    password: 'Jiaxing@123456'
     database: 'login_test'

@@ -4,6 +4,7 @@ import * as fs from 'fs';
 
 const config = {
   development: 'dev',
+  prod: 'prod'
 };
 
 const env = process.env.NODE_ENV || 'development';
