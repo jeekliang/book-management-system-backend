@@ -1,6 +1,6 @@
 import { Injectable, HttpException, Logger } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import {Repository} from 'typeorm'
+import { Repository } from 'typeorm';
 import { RegisterUserDto } from './dto/register.dto';
 import { LoginUserDto } from './dto/login.dto';
 // import { UpdateUserDto } from './dto/update-user.dto';
@@ -25,12 +25,12 @@ export class UserService {
 
   @InjectEntityManager()
   entityManager: EntityManager;
-  
+
   async register(user: RegisterUserDto) {
     const foundUser = await this.userRepository.findOneBy({
-      username: user.username
+      username: user.username,
     });
-    if(foundUser) {
+    if (foundUser) {
       throw new HttpException('该用户已经注册', 200);
     }
     const newUser = new User();
@@ -49,10 +49,10 @@ export class UserService {
   async login(loginUser: LoginUserDto) {
     // console.log(loginUser);
     const foundUser = await this.userRepository.findOneBy({
-      username: loginUser.username
+      username: loginUser.username,
     });
 
-    if(!foundUser) {
+    if (!foundUser) {
       throw new HttpException('用户名不存在', 200);
     }
 
@@ -97,32 +97,37 @@ export class UserService {
 
     const user1 = new User();
     user1.username = '东东';
-    user1.password = 'aaaaaa';
-    user1.permissions  = [
-      permission1, permission2, permission3, permission4
-    ]
+    user1.password = md5('aaaaaa');
+    user1.permissions = [permission1, permission2, permission3, permission4];
 
     const user2 = new User();
     user2.username = '光光';
-    user2.password = 'bbbbbb';
-    user2.permissions  = [
-      permission5, permission6, permission7, permission8
-    ]
+    user2.password = md5('bbbbbb');
+    user2.permissions = [permission5, permission6, permission7, permission8];
 
     await this.entityManager.save([
-      permission1, 
+      permission1,
       permission2,
       permission3,
       permission4,
       permission5,
       permission6,
       permission7,
-      permission8
-    ])
-    await this.entityManager.save([
-      user1, 
-      user2
+      permission8,
     ]);
+    await this.entityManager.save([user1, user2]);
+  }
+
+  async findByUsername(username: string) {
+    const user = await this.entityManager.findOne(User, {
+      where: {
+        username,
+      },
+      relations: {
+        permissions: true,
+      },
+    });
+    return user;
   }
 
   // findOne(id: number) {

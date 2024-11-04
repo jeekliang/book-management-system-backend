@@ -6,10 +6,9 @@ import { UserController } from './user.controller';
 // import { DbModule } from 'src/db/db.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User])
-  ],
+  imports: [TypeOrmModule.forFeature([User])],
   controllers: [UserController],
   providers: [UserService],
+  exports: [UserService],
 })
-export class UserModule {}
+export class UserModule { }
