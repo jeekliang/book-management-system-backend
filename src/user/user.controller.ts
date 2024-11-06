@@ -9,6 +9,7 @@ import {
   UseGuards,
   ValidationPipe,
   SetMetadata,
+  Req
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { RegisterUserDto } from './dto/register.dto';
@@ -17,6 +18,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { LoginGuard } from 'src/login.guard';
 import { PermissionGuard } from './permission.guard';
+import { Request } from 'express';
 // import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
@@ -50,11 +52,20 @@ export class UserController {
           id: foundUser.id,
         },
       });
-      res.setHeader('token', token);
-      return '登录成功';
+      return {
+        ...foundUser,
+        token
+      };
     } else {
       return '登录失败';
     }
+  }
+
+  @Get('userInfo')
+  async getUserInfo(@Req() req: Request) {
+    const authorization = req.headers.authorization;
+    const foundUser = await this.userService.getUserInfo(authorization);
+    return foundUser;
   }
 
   @Get('/user/:id')

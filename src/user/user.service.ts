@@ -1,4 +1,4 @@
-import { Injectable, HttpException, Logger } from '@nestjs/common';
+import { Injectable, HttpException, Logger, Inject, UnauthorizedException } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RegisterUserDto } from './dto/register.dto';
@@ -9,6 +9,7 @@ import { User } from './entities/user.entity';
 import { Permission } from './entities/permission.entity';
 import * as crypto from 'crypto';
 import { EntityManager } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 
 function md5(str) {
   const hash = crypto.createHash('md5');
@@ -25,6 +26,9 @@ export class UserService {
 
   @InjectEntityManager()
   entityManager: EntityManager;
+
+  @Inject(JwtService)
+  private jwtService: JwtService;
 
   async register(user: RegisterUserDto) {
     const foundUser = await this.userRepository.findOneBy({
@@ -123,11 +127,30 @@ export class UserService {
       where: {
         username,
       },
+      select: [
+        'id', 'createTime', 'permissions', 'updateTime', 'username'
+      ],
       relations: {
         permissions: true,
       },
     });
     return user;
+  }
+
+  async getUserInfo(auth: string) {
+    if (!auth) {
+      throw new UnauthorizedException('用户未登录');
+    }
+    try {
+      const token = this.extractTokenFromHeader(auth);
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: 'Ljx!135790@.',
+      });
+      const foundUser = await this.findByUsername(payload.user.username);
+      return foundUser
+    } catch (error) {
+      throw new UnauthorizedException('登录token错误');
+    }
   }
 
   // findOne(id: number) {
@@ -141,4 +164,8 @@ export class UserService {
   // remove(id: number) {
   //   return `This action removes a #${id} user`;
   // }
+  private extractTokenFromHeader(auth: string): string | undefined {
+    const [type, token] = auth?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
+  }
 }
